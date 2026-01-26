@@ -1,6 +1,8 @@
 {
   "name": "Hono + Bun",
-  "dockerComposeFile": ["compose.yaml"],
+  "dockerComposeFile": [
+    "compose.yaml"
+  ],
   "service": "app",
   "workspaceFolder": "/home/vscode/app",
   "shutdownAction": "stopCompose",
@@ -48,8 +50,7 @@
         "tamasfe.even-better-toml",
         "vsls-contrib.gitdoc"
       ],
-      "settings": {
-      }
+      "settings": {}
     }
   }
 }
