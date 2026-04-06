@@ -1,6 +1,8 @@
 {
   "name": "Hono Vite Workers",
-  "dockerComposeFile": ["compose.yaml"],
+  "dockerComposeFile": [
+    "compose.yaml"
+  ],
   "service": "app",
   "workspaceFolder": "/home/vscode/app",
   "shutdownAction": "stopCompose",
@@ -19,7 +21,7 @@
   ],
   "features": {
     "ghcr.io/devcontainers/features/git:1": {
-      "version": "2.52.0"
+      "version": "2.53.0"
     },
     "ghcr.io/devcontainers/features/common-utils:2": {
       "configureZshAsDefaultShell": true
@@ -27,7 +29,7 @@
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/shyim/devcontainers-features/bun:0": {},
     "ghcr.io/devcontainers/features/node:1.5.0": {
-      "version": "25.4.0"
+      "version": "25.9.0"
     },
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "moby": false,
@@ -58,8 +60,7 @@
         "tamasfe.even-better-toml",
         "vsls-contrib.gitdoc"
       ],
-      "settings": {
-      }
+      "settings": {}
     }
   }
 }
