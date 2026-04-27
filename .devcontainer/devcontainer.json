@@ -16,12 +16,12 @@
     "source=${env:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached,readonly"
   ],
   "remoteEnv": {
-      "UV_LINK_MODE": "copy",
-      "WAKATIME_API_KEY": "${localEnv:WAKATIME_API_KEY}"
+    "UV_LINK_MODE": "copy",
+    "WAKATIME_API_KEY": "${localEnv:WAKATIME_API_KEY}"
   },
   "features": {
     "ghcr.io/devcontainers/features/git:1": {
-      "version": "2.53.0"
+      "version": "2.54.0"
     },
     "ghcr.io/devcontainers/features/common-utils:2": {
       "configureZshAsDefaultShell": true
