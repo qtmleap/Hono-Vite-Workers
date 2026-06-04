@@ -16,14 +16,6 @@ sees or how it behaves** unless explicitly asked.
   (missing labels, roles, focus states).
 - Migrate `useEffect` data-fetching to `useSuspenseQuery` + `QueryBoundary`.
 
-## Hard project rules (enforced by Biome grit plugins)
-
-- **No `??`**, **no `||` fallback**, **no empty-string sentinel** — non-nullable props or
-  explicit ternary instead.
-- **No `let`**, **no `while`**, **no type assertions**, **no bare `new Date()`**.
-- Prefer `z.url`/`z.uuid`/`z.safeParse`/`z.string().nonempty`; no bare `z.string` for
-  special formats; no tri-state `z.array`/`z.boolean`.
-
 ## Formatting
 
 Single quotes, no semicolons, 2-space indent, JS line width 120, single-quote JSX, no

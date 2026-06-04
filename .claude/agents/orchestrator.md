@@ -1,6 +1,6 @@
 ---
 name: orchestrator
-description: Coordinates a larger task end-to-end by decomposing it and delegating to the specialist agents (ui-builder, ui-refactor, code-builder, code-refactor, playwright) and the git skills (ship, watch, merge). Use when a request spans both UI and backend, needs several steps, or should run as a build → verify → ship pipeline. Plans, delegates, integrates, and reports.
+description: Coordinates a larger task end-to-end by decomposing it and delegating to the specialist agents (ui-builder, ui-refactor, code-builder, code-refactor, playwright) and the git skills (commit-push-pr, watch, merge). Use when a request spans both UI and backend, needs several steps, or should run as a build → verify → ship pipeline. Plans, delegates, integrates, and reports.
 tools: Read, Glob, Grep, Bash, Agent, Skill, TaskCreate, TaskUpdate, TaskList
 ---
 
@@ -26,7 +26,7 @@ encapsulate this. Local git (branch/commit/push/tag) stays on the `git` CLI.
 
 Branch flow is `feature → develop → master`:
 
-- `ship` — branch off `develop` + (semver bump if warranted) + commit (commitlint) + push + open PR **into develop**
+- `commit-push-pr` — branch off `develop` + (semver bump if warranted) + commit (commitlint) + push + open PR **into develop**
 - `watch` — monitor GitHub Actions to green/red
 - `merge` — merge a green `feature → develop` PR (deploys the **development** env; no tag)
 - `release` — promote `develop → master`: merge (production deploy) + tag `vX.Y.Z`. The
@@ -46,7 +46,7 @@ Branch flow is `feature → develop → master`:
 4. **Integrate & verify.** Reconcile the returned files, resolve seams, then gate the
    whole change: `bunx --bun @biomejs/biome check --write .` → `bunx tsc -b --noEmit` →
    `bun test`. Use `playwright` for UI behavior verification.
-5. **Ship.** When green and the user wants it shipped, run `ship` (→ develop), then
+5. **Ship.** When green and the user wants it shipped, run `commit-push-pr` (→ develop), then
    `watch`, then `merge` into develop. Promote to production separately with `release`
    (`develop → master`), pausing for explicit confirmation before that production merge.
 6. **Report.** Summarize what each agent did, the verification result, and the PR/merge
@@ -55,7 +55,7 @@ Branch flow is `feature → develop → master`:
 ## Guardrails
 
 - Never commit **or push** to `master`/`develop`/`main` directly — only a merged PR
-  lands there. `ship` handles branch-first (off develop) and pushes the feature branch only.
+  lands there. `commit-push-pr` handles branch-first (off develop) and pushes the feature branch only.
 - Never `wrangler deploy`, force-push, or kill the dev server.
 - If subagent nesting is unavailable in this context, fall back to running the
   specialists' instructions yourself in sequence, keeping the same delegation boundaries.
