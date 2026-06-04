@@ -7,16 +7,17 @@ description: Promote develop to master — open (or reuse) the develop→master 
 
 The `develop → master` step of the `feature → develop → master` flow. This is the only
 skill that merges into `master` and triggers a **production** Cloudflare deploy. Use the
-**GitHub MCP** (`mcp__github__*`) — owner/repo **`qtmleap` / `Hono-Vite-Workers`**.
+**GitHub MCP** (`mcp__github__*`); **resolve `<OWNER>`/`<REPO>` from
+`git remote get-url origin`** (this repo: `qtmleap/Hono-Vite-Workers`).
 
 ## Preconditions
 
 - `develop` is ahead of `master` (there is something to release). Check with
-  `mcp__github__list_pull_requests(... base:'master', head:'qtmleap:develop')` or compare
+  `mcp__github__list_pull_requests(... base:'master', head:'<OWNER>:develop')` or compare
   branches; if `develop` is not ahead, there is nothing to release — stop.
 - Decide the release version: read `package.json`'s `version`. It should already reflect
-  the changes on `develop` (bumped by `ship`). If it does not, bump it on `develop` via a
-  normal `ship` PR **first**, then release — never push a version commit straight to
+  the changes on `develop` (bumped by `commit-push-pr`). If it does not, bump it on `develop` via a
+  normal `commit-push-pr` PR **first**, then release — never push a version commit straight to
   `develop`/`master`.
 
 ## Steps
@@ -24,12 +25,12 @@ skill that merges into `master` and triggers a **production** Cloudflare deploy.
 1. **Open (or find) the release PR `develop → master`.**
    ```
    mcp__github__create_pull_request(
-     owner:'qtmleap', repo:'Hono-Vite-Workers',
+     owner: '<OWNER>', repo: '<REPO>',
      base:'master', head:'develop',
      title:'<type>: release vX.Y.Z', body:'<release notes + footer>')
    ```
-   - Title satisfies commitlint (lowercase start, valid `type` incl. `chroe`, ≤ 96 chars),
-     e.g. `chroe: release v0.2.0`.
+   - Title satisfies commitlint (lowercase start, valid `type` incl. `chore`, ≤ 96 chars),
+     e.g. `chore: release v0.2.0`.
    - Body: summary of what is shipping, the version, and the
      `🤖 Generated with [Claude Code](https://claude.com/claude-code)` footer.
    - If a `develop → master` PR already exists, reuse it.
@@ -47,7 +48,7 @@ skill that merges into `master` and triggers a **production** Cloudflare deploy.
    stay in sync and don't diverge:
    ```
    mcp__github__merge_pull_request(
-     owner:'qtmleap', repo:'Hono-Vite-Workers', pullNumber:<pr>,
+     owner: '<OWNER>', repo: '<REPO>', pullNumber:<pr>,
      merge_method:'merge',
      commit_title:'<type>: release vX.Y.Z')
    ```

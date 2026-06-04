@@ -4,14 +4,15 @@
 # Flow:
 #   1. bail if nothing changed
 #   2. never auto-commit onto a protected branch (branch-first rule)
-#   3. gate on Biome check + tsc (the "basis") — skip the commit if either fails
+#   3. run the project gate (commit-gate.sh) — skip the commit if it fails. All
+#      language/stack-specific checks (Biome, tsc, …) live there, not here, so this
+#      script stays generic and reusable across projects.
 #   4. stage everything, ask an LLM for a Conventional Commits header derived
 #      from the diff, then commit with the repo's local git identity
 #
 # Constraints baked in (project memory):
 #   - subject in English, starts lowercase (avoids commitlint subject-case)
-#   - type is restricted to .commitlintrc.yaml's enum (note: `chroe`, not
-#     `chore` — that typo is what the repo's commitlint actually accepts)
+#   - type is restricted to the project's commitlint type-enum
 #   - header <= 96 chars (header-max-length)
 set -u
 
@@ -33,15 +34,11 @@ case "$branch" in
     ;;
 esac
 
-# 3. gate on Biome + tsc — do not commit a red tree
-if ! bunx --bun @biomejs/biome check --no-errors-on-unmatched . >/tmp/auto-commit-biome.log 2>&1; then
-  echo "auto-commit: skipped — biome check failed" >&2
-  tail -20 /tmp/auto-commit-biome.log >&2
-  exit 0
-fi
-if [ -f tsconfig.json ] && ! bunx tsc -b --noEmit >/tmp/auto-commit-tsc.log 2>&1; then
-  echo "auto-commit: skipped — tsc failed" >&2
-  tail -20 /tmp/auto-commit-tsc.log >&2
+# 3. project gate — do not commit a red tree. The stack-specific checks live in
+#    commit-gate.sh (swappable per project); if it is absent, proceed ungated.
+gate="$(dirname "$0")/commit-gate.sh"
+if [ -x "$gate" ] && ! "$gate"; then
+  echo "auto-commit: skipped — commit-gate failed" >&2
   exit 0
 fi
 
@@ -53,7 +50,7 @@ diff="$(git diff --staged --stat; printf '\n----\n'; git diff --staged --unified
 prompt="Write ONE git commit message for the staged diff below.
 Hard rules (all must hold):
 - Conventional Commits header: <type>(<optional-scope>): <subject>
-- type is EXACTLY one of: build ui ci docs feat fix perf refactor revert format test chroe
+- type is EXACTLY one of: build ui ci docs feat fix perf refactor revert format test chore
 - subject and body in English
 - subject starts lowercase (never a capitalized English word), no trailing period
 - header (type+scope+subject) is at most 96 characters
@@ -68,10 +65,15 @@ msg="$(printf '%s' "$prompt" | AUTO_COMMIT_NESTED=1 claude -p --model claude-hai
 msg="$(printf '%s\n' "$msg" | sed '/^```/d')"
 header="$(printf '%s\n' "$msg" | sed '/^[[:space:]]*$/d' | head -n 1)"
 
-# fallback if the LLM gave nothing usable
-if [ -z "$header" ]; then
+# fallback if the LLM gave nothing usable, or the message fails the repo's commitlint
+fallback=''
+[ -z "$header" ] && fallback=1
+if [ -z "$fallback" ] && ls .commitlintrc* commitlint.config.* >/dev/null 2>&1; then
+  printf '%s\n' "$msg" | bunx --bun commitlint >/dev/null 2>&1 || fallback=1
+fi
+if [ -n "$fallback" ]; then
   files="$(git diff --staged --name-only | head -n 3 | tr '\n' ' ')"
-  msg="chroe: update ${files}"
+  msg="chore: update ${files}"
 fi
 
 # 5. commit with the repo's local git identity + Claude trailer

@@ -1,22 +1,24 @@
 ---
-name: ship
+name: commit-push-pr
 description: Commit the current working tree on a feature branch (cut from develop), push it, and open a pull request into develop. Use when the user says "ship this", "make a PR", "commit and push and open a PR", or wants to turn local changes into a reviewable PR. Handles branch-first safety, commitlint-format messages, and the GitHub PR.
 ---
 
-# ship — commit, push, open a PR into develop
+# commit-push-pr — commit, push, open a PR into develop
 
 Turn the current local changes into a pushed feature branch + GitHub PR **targeting
 `develop`**. Never commit **or push** directly onto a protected branch (`master`,
 `develop`, `main`) — work only ever lands there through a merged PR.
 
-**Branch flow:** `feature → develop → master`. `ship` covers `feature → develop`
+**Branch flow:** `feature → develop → master`. `commit-push-pr` covers `feature → develop`
 (merging there deploys to the **development** env). The `develop → master` release
 (production deploy + version tag) is the separate **`release`** skill.
 
 ## Repo coordinates
 
-- GitHub operations go through the **GitHub MCP** (`mcp__github__*`). Owner/repo:
-  **`qtmleap` / `Hono-Vite-Workers`** (derive from `git remote get-url origin` if unsure).
+- GitHub operations go through the **GitHub MCP** (`mcp__github__*`). **Resolve
+  `<OWNER>`/`<REPO>` first** from `git remote get-url origin` (→ `…/<OWNER>/<REPO>.git`;
+  this repo is `qtmleap/Hono-Vite-Workers`). Use the resolved values in every MCP call
+  below — never assume a hard-coded repo, so the skill also works in template-derived repos.
 - Local git (branch, commit, push, tag) uses the `git` CLI — there is no MCP equivalent
   for pushing local commits. `gh` is only a fallback if the MCP is unavailable.
 
@@ -40,7 +42,7 @@ Turn the current local changes into a pushed feature branch + GitHub PR **target
    - **breaking change** (`feat!`, removed/renamed public API, incompatible behavior) → **major**
    - **feat** (new backward-compatible capability) → **minor**
    - **fix / perf / refactor** that ships user-visible behavior → **patch**
-   - pure `docs` / `chroe` / `ci` / `test` / `format` / internal-only → **no bump**
+   - pure `docs` / `chore` / `ci` / `test` / `format` / internal-only → **no bump**
 
    Pre-1.0 nuance (repo is currently `0.x`): keep breaking changes as a **minor** and
    features/fixes as a **patch** until the user opts into 1.0. When in doubt, prefer the
@@ -51,8 +53,8 @@ Turn the current local changes into a pushed feature branch + GitHub PR **target
 
 3. **Commit (commitlint-conventional).** Stage with `git add -A`, then write the message yourself:
    - Header: `<type>(<optional-scope>): <subject>`
-   - `<type>` is EXACTLY one of: `build ui ci docs feat fix perf refactor revert format test chroe`
-     (yes — the repo's `.commitlintrc.yaml` lists `chroe`, not `chore`; using `chore` fails CI).
+   - `<type>` is EXACTLY one of: `build ui ci docs feat fix perf refactor revert format test chore`
+     (the set is defined by the repo's `.commitlintrc.yaml` type-enum).
    - Subject + body in **English**, subject **starts lowercase**, no trailing period
      (avoids the commitlint subject-case failure).
    - Header ≤ **96** chars (`header-max-length`).
@@ -71,7 +73,7 @@ Turn the current local changes into a pushed feature branch + GitHub PR **target
    `release` skill's job).
    ```
    mcp__github__create_pull_request(
-     owner: 'qtmleap', repo: 'Hono-Vite-Workers',
+     owner: '<OWNER>', repo: '<REPO>',
      base: 'develop', head: '<feature-branch>',
      title: '<commitlint-style title>', body: '<body>')
    ```

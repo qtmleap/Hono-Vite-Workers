@@ -6,8 +6,8 @@ description: Merge a feature→develop pull request once CI is green. Use when t
 # merge — merge a feature PR when CI is green
 
 Merge a PR (normally **feature → `develop`**) only after confirming CI passed and there
-are no conflicts. Use the **GitHub MCP** (`mcp__github__*`) — owner/repo
-**`qtmleap` / `Hono-Vite-Workers`**.
+are no conflicts. Use the **GitHub MCP** (`mcp__github__*`); **resolve `<OWNER>`/`<REPO>`
+from `git remote get-url origin`** (this repo: `qtmleap/Hono-Vite-Workers`).
 
 > Merging into `develop` deploys to the **development** env — not production. A PR whose
 > base is `master` is a **release**: stop and use the **`release`** skill (it adds the
@@ -16,8 +16,8 @@ are no conflicts. Use the **GitHub MCP** (`mcp__github__*`) — owner/repo
 ## Identify the target
 
 - Default to the current branch's PR via
-  `mcp__github__list_pull_requests(owner:'qtmleap', repo:'Hono-Vite-Workers',
-  state:'open', head:'qtmleap:<current-branch>')`.
+  `mcp__github__list_pull_requests(owner: '<OWNER>', repo: '<REPO>',
+  state:'open', head:'<OWNER>:<current-branch>')`.
 - Accept an explicit PR number/URL if given.
 
 ## Gate checks (all must hold before merging)
@@ -38,13 +38,13 @@ are no conflicts. Use the **GitHub MCP** (`mcp__github__*`) — owner/repo
 
 ```
 mcp__github__merge_pull_request(
-  owner:'qtmleap', repo:'Hono-Vite-Workers', pullNumber:<pr>,
+  owner: '<OWNER>', repo: '<REPO>', pullNumber:<pr>,
   merge_method:'squash',
   commit_title:'<commitlint-style squash subject>')
 ```
 
 - Default to **squash** merge. `commit_title` must still satisfy commitlint (lowercase
-  start, valid `type` incl. `chroe`, ≤ 96 chars).
+  start, valid `type` incl. `chore`, ≤ 96 chars).
 - `merge_pull_request` has no delete-branch option — after a green merge, delete the
   source branch separately: `git push origin --delete <feature-branch>` (deleting a
   feature branch is fine; never delete/force `master`/`develop`).
