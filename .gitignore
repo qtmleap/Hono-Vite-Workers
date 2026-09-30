@@ -236,3 +236,6 @@ $RECYCLE.BIN/
 # Claude Code
 .claude/settings.local.json
 worker-configuration.d.ts
+
+# Local Codex configuration, credentials, and session state.
+/.codex/
