@@ -9,7 +9,7 @@ jobs:
   deploy:
     name: Deploy workers
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ubuntu-latest, docker]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
