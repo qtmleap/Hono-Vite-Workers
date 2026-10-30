@@ -1,6 +1,6 @@
-# ビッカメ娘
+# Hono-Vite-Workers
 
-Vite + React + TanStack Router + Cloudflare Workers を使用した TypeScript プロジェクト
+Hono + Vite + React + TanStack Router + Cloudflare Workers を使用したフルスタック TypeScript テンプレートリポジトリです。
 
 ## 技術スタック
 
